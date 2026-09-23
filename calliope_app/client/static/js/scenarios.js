@@ -282,7 +282,7 @@ function convertToJSON() {
         let constraintId = safeHTMLId(constraint);
 
         if (isCalliopeVersionSeven(calliope_version)) {
-            let groupConstraintId = constraint.split("||")[1];
+            let groupConstraintId = constraint.split("__")[1];
             let adminGroupConstraint = admin_group_constraints.find(obj => obj.id === Number(groupConstraintId));
             let tempEquations = adminGroupConstraint.equations[0].expression;
 
@@ -407,7 +407,7 @@ function renderDialogGroupConstraints(initialLoad) {
     }
 
     Object.keys(dialogObj).forEach(constraint => {
-        let groupConstraintPrettyName = isCalliopeVersionSeven(calliope_version) && constraint.split("||")[0] ? constraint.split("||")[0] : constraint;
+        let groupConstraintPrettyName = isCalliopeVersionSeven(calliope_version) && constraint.split("__")[0] ? constraint.split("__")[0] : constraint;
         let constraintId = safeHTMLId(constraint);
         let adminGroupConstraint = isCalliopeVersionSeven(calliope_version) ? admin_group_constraints.find(obj => obj.id === Number(dialogObj[constraint].id)) : null;
 
@@ -645,7 +645,7 @@ function createDropdown(key, constraint, label, options, selectedValues, constra
         optionText = option;
 
         if (isMultiSelect) { 
-            optionValue = option.tag ? `${option.name}-${option.tag}` : option.name;
+            optionValue = option.tag ? `${option.name}_${option.tag}` : option.name;
             optionText = option.tag ? `${option.pretty_name} [${option.pretty_tag}]` : (option.pretty_name ? option.pretty_name : option.name);
         } 
         isSelected = selectedValues.includes(optionValue) ? ' selected' : '';
@@ -910,7 +910,7 @@ function activate_scenario_settings() {
                     let tempDialogObj = structuredClone(dialogObj);
                     
                     Object.keys(tempDialogObj).forEach(constraint => {
-                        let groupConstraintId = constraint.split("||")[1];
+                        let groupConstraintId = constraint.split("__")[1];
                         tempDialogObj[constraint].id = Number(groupConstraintId);
                         let adminGroupConstraint = admin_group_constraints.find(obj => obj.id === Number(groupConstraintId));
                         tempDialogObj[constraint].equations[0].expression = adminGroupConstraint.equations[0].expression;    
@@ -1085,7 +1085,7 @@ function activate_scenario_settings() {
                 return;
             }
             groupConstraintId = $('#new_group_constraint_dropdown').val();
-            newGroupConstraint = newGroupConstraint + '||' + groupConstraintId
+            newGroupConstraint = newGroupConstraint + '__' + groupConstraintId
         }
 
         if (newGroupConstraint.length > 0) {
