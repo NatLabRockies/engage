@@ -35,6 +35,7 @@ def group_constraint_options(request):
     model = Model.by_uuid(model_uuid)
     model.handle_view_access(request.user)
 
+    print(list(model.technologies.values()))
     response = {
         "carriers": list(model.carriers.values()),
         "locations": list(model.locations.values()),
