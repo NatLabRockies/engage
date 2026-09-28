@@ -86,7 +86,7 @@ def get_custom_math_yaml_set(run, scenario_id, year):
             # If parameter hasn't been set, add to Return List
             unique_params.append(unique_param)
             key_list = param.run_parameter.root.split('.')
-            dictify(custom_math_yaml_set,key_list,param.value,True)
+            dictify(custom_math_yaml_set,key_list,param.value,update=True)
 
     return custom_math_yaml_set
 
@@ -372,8 +372,8 @@ def dictify(target, keys, value, index=None, dim=None, update=False, simplify=Tr
         
         target[keys[-1]]['data'] += [value]
         target[keys[-1]]['index'] += [index]
-    elif update and target[keys[-1]]:
-        target[keys[-1]] = {*target[keys[-1]], *value}
+    elif update and target.get(keys[-1], {}):
+        target[keys[-1]] = {**target[keys[-1]], **value}
     else:
         target[keys[-1]] = value
     
