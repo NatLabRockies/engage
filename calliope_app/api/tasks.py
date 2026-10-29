@@ -299,7 +299,7 @@ def build_model_csv(model, scenario, start_date, end_date, inputs_path, timestep
                 else:
                     index = ts.parameter.index+ts.index
                     dim = ts.parameter.dim+ts.dim
-            dims = tuple(['techs','parameters'] + dim)
+            dims = tuple(['techs','inputs'] + dim)
             col = tuple([technology_name, parameter_name] + index)
             if dims not in ts_dfs:
                 ts_dfs[dims] = pd.DataFrame(index=pd.date_range(start=start_date, end=end_date, freq=timesteps), columns=pd.MultiIndex(levels=[[] for i in range(0,len(dims))],codes=[[] for i in range(0,len(dims))]))
@@ -328,7 +328,7 @@ def build_model_csv(model, scenario, start_date, end_date, inputs_path, timestep
                 else:
                     index = ts.parameter.index+ts.index
                     dim = ts.parameter.dim+ts.dim
-            dims = tuple(['techs','nodes','parameters'] + dim)
+            dims = tuple(['techs','nodes','inputs'] + dim)
             col = tuple([technology_name, location_1_name, parameter_name] + index)
             if dims not in ts_dfs:
                 ts_dfs[dims] = pd.DataFrame(index=pd.date_range(start=start_date, end=end_date, freq=timesteps), columns=pd.MultiIndex(levels=[[] for i in range(0,len(dims))],codes=[[] for i in range(0,len(dims))]))
