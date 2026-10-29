@@ -61,7 +61,7 @@ def get_model_yaml_set(run, scenario_id, year, ts_files):
         
         for dims, fname in ts_files.items():
             model_yaml_set["data_tables"]["_".join(dims)+"_timeseries"] = {
-                "data": fname,
+                "table": fname,
                 "rows": "timesteps",
                 "columns": list(dims)
             }
