@@ -755,10 +755,10 @@ def _operate_outputs(inputs_dir, outputs_dir, operate_dir, logger):
         node_col = ts_file['columns'].index('nodes') if 'nodes' in ts_file['columns'] else None
         tech_col = ts_file['columns'].index('techs') if 'techs' in ts_file['columns'] else None
         if node_col is not None and tech_col is not None:
-            ts_df = pd.read_csv(os.path.join(operate_dir,ts_file['data']),header=list(range(0, len(ts_file['columns']))),index_col=[0])
+            ts_df = pd.read_csv(os.path.join(operate_dir,ts_file['table']),header=list(range(0, len(ts_file['columns']))),index_col=[0])
             keep_cols = [(c[node_col], c[tech_col]) not in zero_capacity_nodes['techs'] for c in ts_df.columns]
             ts_df = ts_df.loc[:,keep_cols]
-            ts_df.to_csv(os.path.join(operate_dir,ts_file['data']))
+            ts_df.to_csv(os.path.join(operate_dir,ts_file['table']))
     
     # Remove nodes with 0 in all capacities/variables to clean model
     for loc_tech, var_list in zero_capacity_nodes['techs'].items():
@@ -1009,7 +1009,7 @@ def apply_gradient(old_inputs,old_results,new_inputs,old_year,new_year,old_opera
     for key, ts_file in old_model.get('data_tables',{}).items():
         num_keys = len(ts_file['columns'])
         ts_index = tuple(['ts']*num_keys)
-        ts_df_old = pd.read_csv(os.path.join(old_inputs,ts_file['data']),header=list(range(0, num_keys)),index_col=[0])
+        ts_df_old = pd.read_csv(os.path.join(old_inputs,ts_file['table']),header=list(range(0, num_keys)),index_col=[0])
         node_col = ts_file['columns'].index('nodes') if 'nodes' in ts_file['columns'] else None
         tech_col = ts_file['columns'].index('techs') if 'techs' in ts_file['columns'] else None
         if node_col is not None and tech_col is not None:
@@ -1038,16 +1038,16 @@ def apply_gradient(old_inputs,old_results,new_inputs,old_year,new_year,old_opera
 
         ts_df_old.drop(columns=[ts_index],inplace=True)
 
-        if os.path.exists(os.path.join(new_inputs,ts_file['data'])):
-            ts_df_new = pd.read_csv(os.path.join(new_inputs,ts_file['data']),header=list(range(0, num_keys)),index_col=[0])
+        if os.path.exists(os.path.join(new_inputs,ts_file['table'])):
+            ts_df_new = pd.read_csv(os.path.join(new_inputs,ts_file['table']),header=list(range(0, num_keys)),index_col=[0])
             ts_df_new.index = pd.to_datetime(ts_df_new.index)
             ts_df_new = pd.concat([ts_df_new,ts_df_old],axis=1)
         else:
-            new_model['data_sources'][key] = {'source': ts_file['data'], 'rows': 'timesteps',
+            new_model['data_sources'][key] = {'source': ts_file['table'], 'rows': 'timesteps',
                                                                 'columns': ts_file['columns']}
             ts_df_new = ts_df_old
         ts_df_new.index.name = None
-        ts_df_new.to_csv(os.path.join(new_inputs,ts_file['data']))
+        ts_df_new.to_csv(os.path.join(new_inputs,ts_file['table']))
 
 
     with open(new_inputs+'/techs.yaml','w') as outfile:
@@ -1066,7 +1066,7 @@ def apply_gradient(old_inputs,old_results,new_inputs,old_year,new_year,old_opera
         for key, ts_file in old_operate_model.get('data_tables',{}).items():
             num_keys = len(ts_file['columns'])
             ts_index = tuple(['ts']*num_keys)
-            ts_df_old = pd.read_csv(os.path.join(old_operate_inputs,ts_file['data']),header=list(range(0, num_keys)),index_col=[0])
+            ts_df_old = pd.read_csv(os.path.join(old_operate_inputs,ts_file['table']),header=list(range(0, num_keys)),index_col=[0])
             node_col = ts_file['columns'].index('nodes') if 'nodes' in ts_file['columns'] else None
             tech_col = ts_file['columns'].index('techs') if 'techs' in ts_file['columns'] else None
             if node_col is not None and tech_col is not None:
@@ -1094,16 +1094,16 @@ def apply_gradient(old_inputs,old_results,new_inputs,old_year,new_year,old_opera
                     ts_df_old.loc[feb_29_mask] = feb_28
 
             ts_df_old.drop(columns=[ts_index],inplace=True)
-            if os.path.exists(os.path.join(new_operate_inputs,ts_file['data'])):
-                ts_df_new = pd.read_csv(os.path.join(new_operate_inputs,ts_file['data']),header=list(range(0, num_keys)),index_col=[0])
+            if os.path.exists(os.path.join(new_operate_inputs,ts_file['table'])):
+                ts_df_new = pd.read_csv(os.path.join(new_operate_inputs,ts_file['table']),header=list(range(0, num_keys)),index_col=[0])
                 ts_df_new.index = pd.to_datetime(ts_df_new.index)
                 ts_df_new = pd.concat([ts_df_new,ts_df_old],axis=1)
             else:
-                new_model['data_sources'][key] = {'source': ts_file['data'], 'rows': 'timesteps',
+                new_model['data_tables'][key] = {'source': ts_file['table'], 'rows': 'timesteps',
                                                                     'columns': ts_file['columns']}
                 ts_df_new = ts_df_old
             ts_df_new.index.name = None
-            ts_df_new.to_csv(os.path.join(new_operate_inputs,ts_file['data']))
+            ts_df_new.to_csv(os.path.join(new_operate_inputs,ts_file['table']))
 
 
         with open(new_operate_inputs+'/techs.yaml','w') as outfile:
@@ -1131,11 +1131,11 @@ def calculate_capacity_values(inputs_dir, num_timesteps):
     ts_files = {}
     for key, ts_file in model.get('data_tables',{}).items():
         num_keys = len(ts_file['columns'])
-        ts_df = pd.read_csv(os.path.join(inputs_dir,ts_file['data']),header=list(range(0, num_keys)),index_col=[0])
+        ts_df = pd.read_csv(os.path.join(inputs_dir,ts_file['table']),header=list(range(0, num_keys)),index_col=[0])
         node_col = ts_file['columns'].index('nodes') if 'nodes' in ts_file['columns'] else None
         tech_col = ts_file['columns'].index('techs') if 'techs' in ts_file['columns'] else None
-        param_col = ts_file['columns'].index('parameters') if 'parameters' in ts_file['columns'] else None
-        ts_files[ts_file['data']] = {'df':ts_df,'node_col':node_col,'tech_col':tech_col,'param_col':param_col}
+        param_col = ts_file['columns'].index('inputs') if 'inputs' in ts_file['columns'] else None
+        ts_files[ts_file['table']] = {'df':ts_df,'node_col':node_col,'tech_col':tech_col,'param_col':param_col}
     
     # Iterate through locations and technologies to aggregate demand time series
     demand_ts = pd.DataFrame()
