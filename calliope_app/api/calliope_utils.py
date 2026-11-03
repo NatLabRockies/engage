@@ -993,7 +993,7 @@ def apply_gradient(old_inputs,old_results,new_inputs,old_year,new_year,old_opera
                         for s,sc in c.get('slices',{}).items():
                             for i,se in enumerate(sc):
                                 if t in se['expression'] and t+'_'+str(old_year) not in se['expression']:
-                                    new_constraints['constraints'][g]['slices'][s][i]['expression'] = se['expression'].replace(t,t+','+t+'_'+str(old_year))
+                                    new_constraints['constraints'][g]['slices'][s][i]['expression'] = se['expression'].replace(t+',',t+','+t+'_'+str(old_year)+',').replace(t+']',t+','+t+'_'+str(old_year)+']')
 
                 if old_operate_inputs and new_operate_inputs:
                     new_operate_techs[level][t+'_'+str(old_year)] = old_operate_techs[level][t]
@@ -1004,7 +1004,7 @@ def apply_gradient(old_inputs,old_results,new_inputs,old_year,new_year,old_opera
                             for s,sc in c.get('slices',{}).items():
                                 for i,se in enumerate(sc):
                                     if t in se['expression'] and t+'_'+str(old_year) not in se['expression']:
-                                        new_operate_constraints['constraints'][g]['slices'][s][i]['expression'] = se['expression'].replace(t,t+','+t+'_'+str(old_year))
+                                        new_operate_constraints['constraints'][g]['slices'][s][i]['expression'] = se['expression'].replace(t+',',t+','+t+'_'+str(old_year)+',').replace(t+']',t+','+t+'_'+str(old_year)+']')
 
     for key, ts_file in old_model.get('data_tables',{}).items():
         num_keys = len(ts_file['columns'])
